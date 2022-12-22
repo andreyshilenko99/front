@@ -1,14 +1,21 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Card from "./Components/Card/Card";
+import Tabs from "./Components/Tabs/Tabs";
 import Cart from "./Components/Cart/Cart";
-const { getData } = require("./db/db");
-const foods = getData();
+import TabContent from "./Components/Tabs/TabContent";
+import { QueryClient, QueryClientProvider, useQuery  } from "react-query";
+import {GetData} from "./GetData/GetData";
+const foods = GetData();
+
+const queryClient = new QueryClient();
 
 const tele = window.Telegram.WebApp;
 
 function App() {
+
   const [cartItems, setCartItems] = useState([]);
+
 
   useEffect(() => {
     tele.ready();
@@ -44,20 +51,29 @@ function App() {
     tele.MainButton.text = "Pay :)";
     tele.MainButton.show();
   };
-
+    const [activeTab, setActiveTab] = useState("tab1");
   return (
     <>
       <h1 className="heading">Order Food</h1>
       <Cart cartItems={cartItems} onCheckout={onCheckout}/>
-      <div className="cards__container">
+      <div className="Tabs">
+      <QueryClientProvider client={queryClient}>
+      <Tabs/>
+        </QueryClientProvider>
+        <div className="cards__container">
         {foods.map((food) => {
           return (
             <Card food={food} key={food.id} onAdd={onAdd} onRemove={onRemove} />
           );
         })}
       </div>
+      </div>
+
     </>
+
   );
 }
 
 export default App;
+
+
